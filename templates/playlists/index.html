@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+<h3>Your Playlists</h3>
+<a href="/playlists/create" class="btn btn-success mb-3">Create Playlist</a>
+<ul class="list-group">
+  {% for p in playlists %}
+    <li class="list-group-item bg-black text-light">{{ p.name }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

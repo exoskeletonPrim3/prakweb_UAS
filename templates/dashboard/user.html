@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="fw-bold mb-3">For You</h2>
+
+<input class="form-control mb-4"
+  placeholder="Search song or artist..."
+  onkeyup="filterSongs(this.value)">
+
+<div class="card glass p-3 h-100 song-card">
+  <div class="cover-wrap">
+    <img src="{{ s.cover_url }}">
+    <button class="play-overlay"
+      onclick="play('{{ s.audio_url }}','{{ s.title }}','{{ s.cover_url }}')">
+      ▶
+    </button>
+  </div>
+  <h6 class="mt-3">{{ s.title }}</h6>
+  <small class="text-muted">{{ s.artist }}</small>
+</div>
+
+
+<!-- PLAYER -->
+<div id="playerBar" class="player-bar d-none">
+  <img id="pCover">
+  <div class="flex-grow-1">
+    <strong id="pTitle"></strong>
+  </div>
+  <audio id="player" controls></audio>
+</div>
+
+<script>
+function play(url,title,cover){
+  player.src=url;
+  pTitle.innerText=title;
+  pCover.src=cover;
+  playerBar.classList.remove("d-none");
+  player.play();
+}
+function filterSongs(q){
+  document.querySelectorAll(".song").forEach(s=>{
+    s.style.display=s.innerText.toLowerCase().includes(q.toLowerCase())
+      ?"block":"none";
+  })
+}
+</script>
+{% endblock %}

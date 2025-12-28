@@ -1,0 +1,40 @@
+body{ background:#121212; color:white }
+.light{ background:#f4f4f4; color:black }
+
+.glass{
+  background:rgba(255,255,255,.1);
+  backdrop-filter:blur(10px);
+  border-radius:15px;
+}
+
+#particles{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+}
+
+.cover-wrap{
+  position:relative;
+}
+.play-overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  border:none;
+  color:white;
+  font-size:32px;
+  opacity:0;
+  transition:.3s;
+  border-radius:18px;
+}
+.cover-wrap:hover .play-overlay{
+  opacity:1;
+}
+
+.player-bar{
+  animation:pulse 4s infinite ease-in-out;
+}
+@keyframes pulse{
+  0%,100%{ box-shadow:0 0 30px rgba(29,185,84,.4); }
+  50%{ box-shadow:0 0 60px rgba(29,185,84,.8); }
+}

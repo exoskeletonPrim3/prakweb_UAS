@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Admin Dashboard</h3>
+
+<div class="glass p-3 mb-4">
+  <form method="post" action="/songs/add">
+    <input class="form-control mb-2" name="title" placeholder="Judul">
+    <input class="form-control mb-2" name="artist" placeholder="Artis">
+    <input class="form-control mb-2" name="audio_url" placeholder="Audio URL (.mp3)">
+    <input class="form-control mb-2" name="cover_url" placeholder="Cover URL">
+    <button class="btn btn-success w-100">Tambah Lagu</button>
+  </form>
+</div>
+
+<div class="row">
+{% for s in songs %}
+  <div class="col-md-3">
+    <div class="card glass p-2">
+      <img src="{{ s.cover_url }}" class="img-fluid">
+      <strong>{{ s.title }}</strong>
+      <small>{{ s.artist }}</small>
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% endblock %}

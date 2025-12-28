@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h4 class="mb-3">Edit Lagu</h4>
+
+<form method="post" class="glass p-4" style="max-width:500px">
+  <input
+    class="form-control mb-2"
+    name="title"
+    value="{{ song.title }}"
+    required
+  >
+  <input
+    class="form-control mb-2"
+    name="artist"
+    value="{{ song.artist }}"
+    required
+  >
+  <input
+    class="form-control mb-2"
+    name="audio_url"
+    value="{{ song.audio_url }}"
+    required
+  >
+  <input
+    class="form-control mb-2"
+    name="cover_url"
+    value="{{ song.cover_url }}"
+    required
+  >
+
+  <button class="btn btn-success">Update Lagu</button>
+  <a href="/dashboard" class="btn btn-secondary ms-2">Cancel</a>
+</form>
+{% endblock %}

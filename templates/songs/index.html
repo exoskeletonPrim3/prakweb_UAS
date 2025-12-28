@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<h3>Songs</h3>
+<a href="/songs/create" class="btn btn-success mb-3">Add Song</a>
+<table class="table table-dark">
+  <tr><th>Title</th><th>Artist</th></tr>
+  {% for s in songs %}
+  <tr><td>{{ s.title }}</td><td>{{ s.artist }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}
