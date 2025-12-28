@@ -15,9 +15,6 @@ httpx_client = httpx.Client(transport=transport, timeout=10.0)
 options = ClientOptions(httpx_client=httpx_client)
 
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise RuntimeError("SUPABASE env belum diset")
-
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY, options)
 
