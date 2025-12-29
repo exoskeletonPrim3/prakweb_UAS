@@ -7,9 +7,9 @@
   onkeyup="filterSongs(this.value)"
 />
 
-<div class="row">
+<div class="d-flex justify-content-between flex-wrap gap-4">
   {% for s in songs %}
-  <div class="audio-player col-md-4" style="">
+  <div class="audio-player">
     <div class="info">
       <img
         src="{{ s.cover_url }}"
@@ -22,6 +22,7 @@
         "
       />
       <div class="title">{{ s.title }}</div>
+      <div>{{ s.artist }}</div>
       <div class="time">
         <span id="current" class="current">0:00</span>
         <span id="duration" class="duration">0:00</span>
