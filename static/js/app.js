@@ -15,6 +15,11 @@ if (audioPlayer) {
       progress.max = Math.floor(audio.duration);
     });
 
+    audio.addEventListener("loadeddata", () => {
+      duration.textContent = formatTime(audio.duration);
+      progress.max = Math.floor(audio.duration);
+    });
+
     const resetIcon = () => {
       playIcon.classList.remove("bi-pause-fill");
       playIcon.classList.add("bi-play-fill");
