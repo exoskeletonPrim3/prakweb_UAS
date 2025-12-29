@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, redirect, session, abort
+from flask import Flask, render_template, request, redirect, session, abort, flash, url_for, jsonify
+from werkzeug.utils import secure_filename
 from supabase import create_client, ClientOptions
 from dotenv import load_dotenv
 import httpx
 import os
+import uuid
+
 
 load_dotenv()
 
@@ -14,6 +17,9 @@ transport = httpx.HTTPTransport(http2=False)
 httpx_client = httpx.Client(transport=transport, timeout=10.0)
 options = ClientOptions(httpx_client=httpx_client)
 
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise RuntimeError("SUPABASE env belum diset")
 
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY, options)
@@ -100,69 +106,119 @@ def register():
 
     return render_template("auth/register.html", error=error, loginPage=True)
 
+
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
 
+
 @app.route("/dashboard")
 def dashboard():
     login_required()
 
-    songs = supabase.table("songs").select("*").execute().data
+    songs = supabase.table("songs").select(
+        "*").order("title", desc=False).execute().data
 
-    if session["role"] == "admin":
-        return render_template("dashboard/admin.html", s=songs)
+    if session.get("role") == "admin":
+        return render_template("dashboard/admin.html", songs=songs)
 
-    return render_template("dashboard/user.html", s=songs)
+    return render_template("dashboard/user.html", songs=songs)
 
 
 @app.route("/songs/add", methods=["POST"])
 def add_song():
     admin_required()
 
-    supabase.table("songs").insert({
-        "title": request.form["title"],
-        "artist": request.form["artist"],
-        "audio_url": request.form["audio_url"],
-        "cover_url": request.form["cover_url"]
-    }).execute()
+    if request.method == "POST":
+        title = request.form.get("title")
+        artist = request.form.get('artist')
+        audio_file = request.files.get('audio_file')
+        cover_file = request.files.get('cover_file')
+
+        audio_filename = f"{uuid.uuid4()}-{secure_filename(audio_file.filename)}"
+        cover_filename = f"{uuid.uuid4()}-{secure_filename(cover_file.filename)}"
+
+        audio_data = audio_file.read()
+        cover_data = cover_file.read()
+
+        supabase.storage.from_("songs").upload(
+            path=audio_filename,
+            file=audio_data,
+            file_options={"content-type": audio_file.content_type}
+        )
+
+        audio_url = supabase.storage.from_("songs").get_public_url(
+            audio_filename
+        )
+
+        supabase.storage.from_("cover_audio").upload(
+            path=cover_filename,
+            file=cover_data,
+            file_options={"content-type": cover_file.content_type}
+        )
+
+        cover_url = supabase.storage.from_("cover_audio").get_public_url(
+            cover_filename
+        )
+
+        supabase.table("songs").insert({
+            "title": title,
+            "artist": artist,
+            "audio_url": audio_url,
+            "cover_url": cover_url
+        }).execute()
+
+        return redirect("/dashboard")
 
     return redirect("/dashboard")
+
 
 @app.route("/songs/edit/<song_id>", methods=["GET", "POST"])
 def edit_song(song_id):
     admin_required()
 
-    song = (
-        supabase
-        .table("songs")
-        .select("*")
-        .eq("id", song_id)
-        .single()
-        .execute()
-        .data
-    )
-
-    if request.method == "POST":
-        supabase.table("songs").update({
-            "title": request.form["title"],
-            "artist": request.form["artist"],
-            "audio_url": request.form["audio_url"],
-            "cover_url": request.form["cover_url"]
-        }).eq("id", song_id).execute()
-
+    song = supabase.table("songs").select(
+        "*").eq("id", song_id).single().execute().data
+    if not song:
         return redirect("/dashboard")
 
-    return render_template("dashboard/edit_song.html", song=song)
+    if request.method == "POST":
+        title = request.form.get('title')
+        artist = request.form.get('artist')
+
+        res = supabase.table('songs').update({
+            "title": title,
+            "artist": artist
+        }).eq("id", song_id).execute()
+
+        flash('Update berhasil!', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template("dashboard/edit.html", song=song)
 
 
-@app.route("/songs/delete/<song_id>")
+@app.route("/songs/delete/<song_id>", methods=["POST"])
 def delete_song(song_id):
     admin_required()
 
-    supabase.table("songs").delete().eq("id", song_id).execute()
-    return redirect("/dashboard")
+    res = supabase.table('songs').select(
+        'audio_url, cover_url').eq('id', song_id).execute()
+
+    if not res.data:
+        return jsonify({"success": False, "error": "Song not found"}), 404
+
+    audio_url = res.data[0]["audio_url"]
+    cover_url = res.data[0]["cover_url"]
+    audio_name = audio_url.split("/")[-1]
+    cover_name = cover_url.split("/")[-1]
+
+    supabase.storage.from_("songs").remove([audio_name])
+    supabase.storage.from_("cover_audio").remove([cover_name])
+
+    supabase.table('songs').delete().eq('id', song_id).execute()
+
+    return jsonify({"success": True})
 
 
 if __name__ == "__main__":

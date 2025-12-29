@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block content %}
 <div
   class="d-flex justify-content-center align-items-center"
-  style="height: calc(100vh - 50px);"
+  style="height: calc(100vh - 50px)"
 >
   <div class="col-md-4 mx-auto glass p-4">
     <h4>Login</h4>
@@ -17,9 +17,8 @@
         placeholder="Password"
       />
       <span
-        >Belum punya akun?<a href="{{ url_for('register') }}"
-          >Daftar disini</a
-        ></span
+        >Belum punya akun?
+        <a href="{{ url_for('register') }}">Daftar disini</a></span
       >
       <button class="btn btn-success w-100">Login</button>
     </form>

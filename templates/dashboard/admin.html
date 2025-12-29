@@ -1,26 +1,86 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <h3>Admin Dashboard</h3>
 
 <div class="glass p-3 mb-4">
-  <form method="post" action="/songs/add">
-    <input class="form-control mb-2" name="title" placeholder="Judul">
-    <input class="form-control mb-2" name="artist" placeholder="Artis">
-    <input class="form-control mb-2" name="audio_url" placeholder="Audio URL (.mp3)">
-    <input class="form-control mb-2" name="cover_url" placeholder="Cover URL">
+  <form method="post" action="/songs/add" enctype="multipart/form-data">
+    <input
+      class="form-control mb-2"
+      type="text"
+      name="title"
+      placeholder="Judul"
+      required
+    />
+
+    <input
+      class="form-control mb-2"
+      type="text"
+      name="artist"
+      placeholder="Artis"
+      required
+    />
+
+    <input
+      class="form-control mb-2"
+      type="file"
+      name="audio_file"
+      accept="audio/mpeg"
+      required
+    />
+
+    <input
+      class="form-control mb-2"
+      type="file"
+      name="cover_file"
+      accept="image/jpeg,image/png"
+      required
+    />
+
     <button class="btn btn-success w-100">Tambah Lagu</button>
   </form>
 </div>
 
-<div class="row">
-{% for s in songs %}
-  <div class="col-md-3">
-    <div class="card glass p-2">
-      <img src="{{ s.cover_url }}" class="img-fluid">
-      <strong>{{ s.title }}</strong>
-      <small>{{ s.artist }}</small>
+<div class="d-flex flex-wrap" style="gap: 16px">
+  {% for s in songs %}
+  <div
+    style="
+      width: 300px;
+      box-shadow: 0 0 15px cyan;
+      padding: 20px;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #1f1f1f, #111);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.15);
+    "
+    class="song-card"
+  >
+    <div style="color: white">
+      <img
+        src="{{ s.cover_url }}"
+        class="img-fluid"
+        style="height: 250px; width: 100%; border-radius: 16px 16px 0 0"
+      />
+      <div>
+        <strong>{{ s.title }}</strong>
+      </div>
+      <div class="d-flex justify-content-between">
+        <small>{{ s.artist }}</small>
+        <div>
+          <button
+            style="color: cyan; background: none; border: none"
+            data-id="{{ s.id }}"
+            class="update-btn"
+          >
+            <i class="bi bi-trash-fill"></i>
+          </button>
+          <a
+            href="{{ url_for('edit_song', song_id=s.id) }}"
+            style="color: cyan; background: none; border: none"
+          >
+            <i class="bi bi-pen-fill"></i>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
-{% endfor %}
+  {% endfor %}
 </div>
 {% endblock %}

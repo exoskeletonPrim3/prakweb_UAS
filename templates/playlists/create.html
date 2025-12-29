@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 <h3>Create Playlist</h3>
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
   <input name="name" class="form-control mb-2" placeholder="Playlist Name" required>
   <button class="btn btn-success">Create</button>
 </form>
